@@ -53,4 +53,9 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    div [ class "m-6 text-xl" ] [ text "Why hello there." ]
+    div [ class "flex-col p-6 space-y-4" ]
+        [ div []
+            [ div [ class "text-xl underline" ] [ text "Logging" ]
+            , div [ class "" ] [ text <| "Wood: " ++ String.fromInt 5 ]
+            ]
+        ]
