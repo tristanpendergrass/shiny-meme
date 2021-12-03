@@ -1,8 +1,9 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, div, text)
-import Html.Attributes exposing (class)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 
 main : Program () Model Msg
@@ -14,13 +15,18 @@ main =
 -- MODEL
 
 
+type PlayerLocation
+    = City
+    | Fields
+
+
 type alias Model =
-    String
+    { playerLocation : PlayerLocation }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( "Why hello there", Cmd.none )
+    ( { playerLocation = City }, Cmd.none )
 
 
 
@@ -28,14 +34,22 @@ init _ =
 
 
 type Msg
-    = HandleThingInput String
+    = NoOp
+    | MoveLocation PlayerLocation
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg _ =
+update msg model =
     case msg of
-        HandleThingInput str ->
-            ( str, Cmd.none )
+        NoOp ->
+            ( model, Cmd.none )
+
+        MoveLocation newLocation ->
+            ( { model
+                | playerLocation = newLocation
+              }
+            , Cmd.none
+            )
 
 
 
@@ -55,7 +69,19 @@ view : Model -> Html Msg
 view model =
     div [ class "flex-col p-6 space-y-4" ]
         [ div []
-            [ div [ class "text-xl underline" ] [ text "Logging" ]
-            , div [ class "" ] [ text <| "Wood: " ++ String.fromInt 5 ]
+            [ div [ class "text-xl underline" ] [ text "Location" ]
+            , div [ class "" ]
+                [ text <|
+                    case model.playerLocation of
+                        City ->
+                            "City"
+
+                        Fields ->
+                            "Fields"
+                ]
+            , div [ class "flex items-center space-x-2" ]
+                [ button [ class "btn", onClick <| MoveLocation City ] [ text "Move to city" ]
+                , button [ class "btn", onClick <| MoveLocation Fields ] [ text "Move to fields" ]
+                ]
             ]
         ]
