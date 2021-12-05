@@ -15,18 +15,52 @@ main =
 -- MODEL
 
 
-type PlayerLocation
-    = City
-    | Fields
+type alias Inventory =
+    { wood : Int
+    , stone : Int
+    , berries : Int
+    }
+
+
+type Location
+    = Camp Activities
+    | Forest Activities
 
 
 type alias Model =
-    { playerLocation : PlayerLocation }
+    { playerLocation : Location
+    , playerInventory : Inventory
+    , campInventory : Inventory
+    }
+
+
+type Activity
+    = SupplyDrop Bool Inventory
+    | Tree
+    | Rock
+    | BerryBush
+
+
+type alias Activities =
+    List Activity
+
+
+emptyInventory : Inventory
+emptyInventory =
+    { wood = 0
+    , stone = 0
+    , berries = 0
+    }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { playerLocation = City }, Cmd.none )
+    ( { playerLocation = Camp []
+      , playerInventory = emptyInventory
+      , campInventory = emptyInventory
+      }
+    , Cmd.none
+    )
 
 
 
@@ -35,7 +69,7 @@ init _ =
 
 type Msg
     = NoOp
-    | MoveLocation PlayerLocation
+    | MoveLocation Location
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -65,23 +99,39 @@ subscriptions _ =
 -- VIEW
 
 
+locationHeader : Model -> Html Msg
+locationHeader model =
+    let
+        locationButton : String
+        locationButton =
+            "btn w-32"
+    in
+    div [ class "flex items-center space-x-4" ]
+        [ div [ class "flex items-center space-x-2" ]
+            [ img [ src "../static/forest.png" ] []
+            , div [ class "underline text-4xl w-32" ]
+                [ text <|
+                    case model.playerLocation of
+                        Camp _ ->
+                            "Camp"
+
+                        Forest _ ->
+                            "Forest"
+                ]
+            ]
+        , div [ class "flex items-center space-x-2" ]
+            [ case model.playerLocation of
+                Camp _ ->
+                    button [ class locationButton, onClick <| MoveLocation (Forest []) ] [ text "=> Forest" ]
+
+                Forest _ ->
+                    button [ class locationButton, onClick <| MoveLocation (Camp []) ] [ text "=> Camp" ]
+            ]
+        ]
+
+
 view : Model -> Html Msg
 view model =
     div [ class "flex-col p-6 space-y-4" ]
-        [ div []
-            [ div [ class "text-xl underline" ] [ text "Location" ]
-            , div [ class "" ]
-                [ text <|
-                    case model.playerLocation of
-                        City ->
-                            "City"
-
-                        Fields ->
-                            "Fields"
-                ]
-            , div [ class "flex items-center space-x-2" ]
-                [ button [ class "btn", onClick <| MoveLocation City ] [ text "Move to city" ]
-                , button [ class "btn", onClick <| MoveLocation Fields ] [ text "Move to fields" ]
-                ]
-            ]
+        [ locationHeader model
         ]
