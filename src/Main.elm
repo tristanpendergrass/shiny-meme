@@ -105,10 +105,19 @@ locationHeader model =
         locationButton : String
         locationButton =
             "btn w-32"
+
+        locationSrc : String
+        locationSrc =
+            case model.playerLocation of
+                Camp _ ->
+                    "camp.png"
+
+                Forest _ ->
+                    "forest.png"
     in
     div [ class "flex items-center space-x-4" ]
         [ div [ class "flex items-center space-x-2" ]
-            [ img [ src "../static/forest.png" ] []
+            [ img [ src locationSrc ] []
             , div [ class "underline text-4xl w-32" ]
                 [ text <|
                     case model.playerLocation of
